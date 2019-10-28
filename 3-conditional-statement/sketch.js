@@ -3,24 +3,27 @@ let balls = [];
 
 //create a variable to hold your avatar
 let me;
+// let dead = false;
 
 
 function setup() {
   createCanvas(500, 400);
 
   //make one avatar called me
-  me = new Avatar(width/2, 300, 3);
+  me = new Avatar(width/2, 300, false);
 
 }
 
 function draw(){
+  // if(dead){
 	background(220);
 
   me.drawMe();
   me.moveMe();
+  me.die();
 
-  if (frameCount % 25 == 0) {
-      let  b = new Ball(width, random(0,height), -3);
+  if (frameCount % 7 == 0) {
+      let  b = new Ball(width, random(5,height), -7);
       balls.push(b);
       console.log(balls); //print the balls array to the console
     }
@@ -29,44 +32,57 @@ function draw(){
 	for (let i = 0; i < balls.length; i++) {
 	 	      balls[i].drawBall();
        	  balls[i].moveBall();
-        	balls[i].bounceBall();
-	  }
+          // balls[i].die();
 
+  }
 }
 
 //avatar class
 class Avatar {
 
-	constructor(x,y, speed){ //every avatar needs an x value, a y value, and a speed
+	constructor(x,y,died){ //every avatar needs an x value, a y value, and a speed
 		    this.x = x;
     		this.y = y;
-        this.speed = speed;
+        this.died = died;
 	}
 
 	drawMe(){  // draw the running person
-    		stroke("green");
-        strokeWeight(3);
-    		fill("blue");
-		    ellipse(this.x,this.y,20,20);
-        line(this.x,this.y, this.x, this.y+40);
-        line(this.x, this.y+40, this.x-20, this.y+60);
-        line(this.x, this.y+40, this.x+10, this.y+50);
-        line(this.x+10, this.y+50, this.x+5, this.y+60);
-        line(this.x, this.y+15, this.x-10, this.y+25);
-        line(this.x-10, this.y+25, this.x+10, this.y+35);
+    if(this.died == false){
+      stroke("green");
+      strokeWeight(3);
+      fill("blue");
+      ellipse(this.x,this.y,20,20);
+      line(this.x,this.y, this.x, this.y+40);
+      line(this.x, this.y+40, this.x-20, this.y+60);
+      line(this.x, this.y+40, this.x+10, this.y+50);
+      line(this.x+10, this.y+50, this.x+5, this.y+60);
+      line(this.x, this.y+15, this.x-10, this.y+25);
+      line(this.x-10, this.y+25, this.x+10, this.y+35);
+    }
+    else if(this.died == true){
+      text('game over',width/2,height/2)
+    }
+
+
 	}
 
 	moveMe(){
-    if (keyIsDown(UP_ARROW)) { //if you hold the up arrow, move up by speed
-       this.y -= this.speed;
-    }
 
-    if (keyIsDown(DOWN_ARROW)) { // if you hold the down arrow, move down by speed
-        this.y += this.speed;
-    }
+       this.y = mouseY;
+
+
+    // if (keyIsDown(DOWN_ARROW)) { // if you hold the down arrow, move down by speed
+        this.x =mouseX;
+    // }
 	}
 
   die(){
+    for (let i = 0; i < balls.length; i++) {
+      if (balls[i].x >= this.x-15 && balls[i].x <= this.x+15 && balls[i].y > this.y-40 && balls[i].y < this.y+40){
+        this.died = true;
+      }
+
+    }
 
   }
 
@@ -98,10 +114,5 @@ class Ball {
 	}
 
 	//if the ball hits the person, change the speed value to negative (send it in the opposite direction)
-  	bounceBall(){
-    		if (this.x >= me.x-15 && this.x <= me.x+15 && this.y > me.y-40 && this.y < me.y+40){
-      			this.speed = -this.speed;
-    		}
-  	}
 
 }
