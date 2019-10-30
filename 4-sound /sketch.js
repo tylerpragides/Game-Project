@@ -6,21 +6,23 @@ let me;
 
 let mySound;
 
+var bouncing = false;
+
 function preload() {
-  soundFormats('mp3', 'ogg');
-  mySound = loadSound('boing1.mp3');
+  soundFormats('mp3', 'ogg', 'wav');
+  mySound = loadSound('burp.wav');
 }
 
 function setup() {
   createCanvas(500, 400);
+  background(220);
 
   //make one avatar called me
-  me = new Avatar(width/2, 300, 3);
+  me = new Avatar(width/2, 300, 3, 0, 1);
 
 }
 
 function draw(){
-	background(220);
 
   me.drawMe();
   me.moveMe();
@@ -31,7 +33,7 @@ function draw(){
       console.log(balls); //print the balls array to the console
     }
 
-//	draw all the balls in that array
+// //	draw all the balls in that array
 	for (let i = 0; i < balls.length; i++) {
 	 	      balls[i].drawBall();
        	  balls[i].moveBall();
@@ -43,32 +45,54 @@ function draw(){
 //avatar class
 class Avatar {
 
-	constructor(x,y, speed){ //every avatar needs an x value, a y value, and a speed
+	constructor(x,y, speed, snake, face){ //every avatar needs an x value, a y value, and a speed
 		    this.x = x;
     		this.y = y;
         this.speed = speed;
+        this.snake = snake;
+        this.face = face;
 	}
 
 	drawMe(){  // draw the running person
     		stroke("green");
         strokeWeight(3);
     		fill("blue");
-		    ellipse(this.x,this.y,20,20);
-        line(this.x,this.y, this.x, this.y+40);
-        line(this.x, this.y+40, this.x-20, this.y+60);
-        line(this.x, this.y+40, this.x+10, this.y+50);
-        line(this.x+10, this.y+50, this.x+5, this.y+60);
-        line(this.x, this.y+15, this.x-10, this.y+25);
-        line(this.x-10, this.y+25, this.x+10, this.y+35);
+        if (this.face == 1 && bouncing == true) {
+        ellipse(this.x + this.snake,this.y,15,15);
+      }
+
+      if (this.face == 2 && bouncing == true) {
+        ellipse(this.x - this.snake,this.y,15,15);
+      }
+
+      if (this.face == 3 && bouncing == true) {
+        ellipse(this.x, this.y + this.snake,15,15);
+      }
+
+      if (this.face == 4 && bouncing == true) {
+        ellipse(this.x, this.y - this.snake,15,15);
+      }
 	}
 
 	moveMe(){
     if (keyIsDown(UP_ARROW)) { //if you hold the up arrow, move up by speed
        this.y -= this.speed;
+       this.face = 4
     }
 
     if (keyIsDown(DOWN_ARROW)) { // if you hold the down arrow, move down by speed
         this.y += this.speed;
+        this.face = 3
+    }
+
+    if (keyIsDown(LEFT_ARROW)) {
+      this.x -= this.speed;
+      this.face = 2
+    }
+
+    if (keyIsDown(RIGHT_ARROW)) {
+      this.x += this.speed;
+      this.face = 1
     }
 	}
 
@@ -105,10 +129,12 @@ class Ball {
 
 	//if the ball hits the paddle, change the speed value to negative (send it in the opposite direction)
   	bounceBall(){
-    		if (this.x >= me.x-15 && this.x <= me.x+15 && this.y > me.y-40 && this.y < me.y+40){
+    		if (this.x >= me.x-15 && this.x <= me.x+15 && this.y > me.y-15 && this.y < me.y+15){
       			this.speed = -this.speed;
-            mySound.setVolume(0.1);
+            mySound.setVolume(0.05);
             mySound.play();
+            this.snake += 15
+            bouncing = true
     		}
   	}
 
